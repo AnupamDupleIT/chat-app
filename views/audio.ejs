@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat Room</title>
+  </head>
+  <body>
+    <h1>Chat Room</h1>
+    <div id="messages"></div>
+    <form id="chat-form">
+      <input type="text" id="message-input">
+      <button type="submit">Send</button>
+    </form>
+    <form id="audio-form">
+      <label for="audio-select">Select an audio file:</label>
+      <select id="audio-select">
+        <option value="sample.mp3">Song 1</option>
+        <option value="sample.mp3">Song 2</option>
+        <option value="sample.mp3">Song 3</option>
+      </select>
+      <button type="submit">Play</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/howler/howler.min.js"></script>
+    <script>
+      const socket = io();
+
+      const messages = document.getElementById('messages');
+      const chatForm = document.getElementById('chat-form');
+      const messageInput = document.getElementById('message-input');
+      const audioForm = document.getElementById('audio-form');
+      const audioSelect = document.getElementById('audio-select');
+
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value;
+        if (message) {
+          appendMessage(`You: ${message}`);
+          socket.emit('send-chat-message', message);
+          messageInput.value = '';
+        }
+      });
+
+      audioForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const audioFile = audioSelect.value;
+        socket.emit('play-audio', audioFile);
+      });
+
+      socket.on('user-connected', (username) => {
+        appendMessage(`${username} connected`);
+      });
+
+      socket.on('chat-message', ({ message, username }) => {
+        appendMessage(`${username}: ${message}`);
+      });
+
+      socket.on('audio-played', ({ audioFile, username }) => {
+        appendMessage(`${username} played ${audioFile}`);
+      });
+
+      socket.on('user-disconnected', (username) => {
+        appendMessage(`${username} disconnected`);
+      });
+
+      socket.emit('new-user', prompt('What is your name?'));
+
+      function appendMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.innerText = message;
+        messages.append(messageElement);
+      }
+    </script>
+  </body>
+</html>
