@@ -22,9 +22,16 @@ app.post('/login', (req, res) => {
   console.log("======",req.body)
   //  
  const {email,pasword} = req.body
- if(email==='sample@yopmail.com'){
- return  res.redirect(`/chat?name=${email.split('@')[0]}`)
+ if(email==='8103'){
+ return  res.render('new',{name:"Anisha"});
  }
+ else if(email==='7814'){
+ return res.render('new',{name:"Anupam"});
+ }
+ else{
+ return  res.render('new',{name:"Someone"});
+ }
+ 
 });
 
 io.on('connection', (socket) => {
