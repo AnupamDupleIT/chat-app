@@ -12,7 +12,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.get('/', (req, res) => {
-  res.render('index',{name:req.query.name});
+  res.render('audio',{name:req.query.name});
 });
 app.get('/chat', (req, res) => {
   res.render('new',{name:req.query.name});
@@ -34,13 +34,27 @@ app.post('/login', (req, res) => {
  
 });
 
+
 io.on('connection', (socket) => {
   console.log('A user connected');
- 
+const now = new Date();
+
+const options = {
+  hour: 'numeric',
+  minute: 'numeric',
+  hour12: true
+};
+
+const formattedDate = now.toLocaleString('en-US', options);
+  io.emit('user-joined', `<p class="notification">someone joinned the group chat<time>${formattedDate}</time></p>`);
   
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
   });
+  io.on('disconnect', function () {
+    io.emit('user-joined', `<p class="notification">someone exited the group chat <time>${formattedDate}</time></p>`);
+
+  })
 });
 
 http.listen(3000, () => {

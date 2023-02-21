@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <body>
 
@@ -6,4 +6,74 @@
 </iframe>
 
 </body>
+</html> -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+}
+
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 50%;
+  border: none;
+}
+</style>
+</head>
+<body>
+
+
+<div class="container"> 
+  <!-- <iframe class="responsive-iframe" src="https://www.youtube.com/embed/tgbNymZ7vqY"></iframe> -->
+  <iframe id="video" class="responsive-iframe" src="https://www.youtube.com/embed/tgbNymZ7vqY"></iframe>
+  <input  onchange="playVideo();" type="text"></input>
+</div>
+
+</body>
+<script>
+    // var iframe = document.getElementById('video')
+    // Get a reference to the iframe element
+const iframe = document.getElementById('video');
+
+// Add a click event listener to the iframe
+iframe.addEventListener('click', () => {
+  // Get a reference to the iframe's contentWindow
+  const contentWindow = iframe.contentWindow;
+
+  // Get a reference to the YouTube player object
+  const player = contentWindow['YT'] && contentWindow['YT']['Player'] ? contentWindow['YT']['Player'] : null;
+
+  // Check if the player object is available
+  if (player) {
+    // Check if the video is currently playing
+    if (player.getPlayerState() === 1) {
+      // If the video is playing, pause it
+      player.pauseVideo();
+    } else {
+      // If the video is not playing, start playing it
+      player.playVideo();
+    }
+  }
+});
+
+// //     function playVideo() {
+// //   var iframe = document.getElementById('video').addEventListener('click',()=>{
+// //     iframe.contentWindow.postMessage('play', '*');
+// //   });;
+// // //   iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+
+// }
+// playVideo()
+</script>
 </html>
