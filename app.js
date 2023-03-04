@@ -2,6 +2,7 @@
 
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
@@ -9,14 +10,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
+const MongoClient = require('mongodb').MongoClient;
+// const uri = "mongodb+srv://tshivam:shivam1234@owonto.gc1vyas.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://anupam:Password123.@cluster0.d3fot8v.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 
 app.get('/', (req, res) => {
-  res.render('audio',{name:req.query.name});
+  res.render('video2',{name:req.query.name});
 });
 app.get('/chat', (req, res) => {
   res.render('new',{name:req.query.name});
 });
+
 app.post('/login', (req, res) => {
 
   console.log("======",req.body)
@@ -50,6 +57,9 @@ const formattedDate = now.toLocaleString('en-US', options);
   
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
+  });
+  socket.on('selectVideo', function(videoId) {
+    io.emit('playVideo', videoId);
   });
   io.on('disconnect', function () {
     io.emit('user-joined', `<p class="notification">someone exited the group chat <time>${formattedDate}</time></p>`);

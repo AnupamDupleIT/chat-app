@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+    <div id="player"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Replace the video ID with the ID of the YouTube video you want to play
+        const socket = io();
+        var videoId = "5qm8PH4xAss";
+        
+        // Create a new YouTube player object
+        var player;
+        
+        function onYouTubeIframeAPIReady() {
+          player = new YT.Player("player", {
+            height: "360",
+            width: "640",
+            videoId: videoId,
+            events: {
+              'onReady': onPlayerReady,
+              'onStateChange': onPlayerStateChange
+            }
+          });
+        }
+        
+        function onPlayerReady(event) {
+          // Send the video ID to the server when the player is ready
+          socket.emit('selectVideo', videoId);
+        }
+        
+        function onPlayerStateChange(event) {
+          // Synchronize the video playback between all the clients
+          if (event.data == YT.PlayerState.PLAYING) {
+            socket.emit('playVideo', player.getCurrentTime());
+          } else if (event.data == YT.PlayerState.PAUSED) {
+            socket.emit('pauseVideo', player.getCurrentTime());
+          } else if (event.data == YT.PlayerState.ENDED) {
+            socket.emit('endVideo');
+          }
+        }
+        
+        // Listen for the 'playVideo' event from the server and play the video
+        socket.on('playVideo', function(time) {
+          player.seekTo(time);
+          player.playVideo();
+        });
+        
+        // Listen for the 'pauseVideo' event from the server and pause the video
+        socket.on('pauseVideo', function(time) {
+          player.seekTo(time);
+          player.pauseVideo();
+        });
+        
+        // Listen for the 'endVideo' event from the server and stop the video
+        socket.on('endVideo', function() {
+          player.stopVideo();
+        });
+        </script>
+</body>
+</html>
