@@ -32,6 +32,8 @@
         
         function onPlayerReady(event) {
           // Send the video ID to the server when the player is ready
+          player.postMessage('{"event":"command","func":"playVideo","args":""}', 'https://www.youtube.com', {origin: 'https://chat.publicprolepoints.in'});
+ 
           socket.emit('selectVideo', videoId);
         }
         
